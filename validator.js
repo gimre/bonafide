@@ -2,31 +2,34 @@
 
 var Validator = function ( value ) {
     this.value = value;
-    this.state = true;
+    this.error = undefined;
 };
 
-var validators = {
-    isInt:    function ( x ) { return x === ( x | 0 ); },
-    isNumber: function ( x ) { return !isNaN( x ); }
-};
-
-Object.keys( validators ).forEach( function ( k ) {
-    Validator.prototype[ k ] = function ( ) {
-        if ( this.state ) {
-            this.state = this.state && validators[ k ]( this.value );
+Validator.addValidator = function ( name, error, func ) {
+    Validator.prototype[ name ] = function ( ) {
+        if ( !this.error ) {
+            if ( !func( this.value ) ) {
+                this.error = error;
+            }
         }
         return this;
     }
+};
+
+var validators = {
+    isInt:    {
+        func: function ( x ) { return x === ( x | 0 ); },
+        error: 'not an integer'
+    },
+    isNumber: {
+        func: function ( x ) { return !isNaN( x ); },
+        error: 'not a number'
+    }
+};
+
+Object.keys( validators ).forEach( function ( k ) {
+    var validator = validators[ k ];
+    Validator.addValidator( k, validator.error, validator.func );
 } );
-
-Validator.prototype.valueOf = function ( ) {
-    return this.state;
-};
-
-Validator.prototype.toString = function ( ) {
-    return this.state;
-};
-
-Validator.prototype.inspect = Validator.prototype.toString;
 
 exports = module.exports = Validator;

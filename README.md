@@ -1,2 +1,2 @@
 # bonafide
-Validation library for Node.js
+Validation library for Node.js / browser

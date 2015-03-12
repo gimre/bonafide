@@ -6,6 +6,13 @@ var bonafide = function ( value ) {
     return new Validator( value );
 };
 
-console.log( bonafide( 2.1 ).isNumber( ).isInt( ) );
+Validator.addValidator( 'isString', 'not a string', function ( x ) {
+    return typeof x === 'string';
+} );
+
+var res = bonafide( {} ).isInt( );
+if ( res.error ) {
+    console.log( res.error );
+}
 
 exports = module.exports;
