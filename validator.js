@@ -3,6 +3,7 @@
 var Validator = function ( value ) {
     this.value = value;
     this.error = undefined;
+    this.continue = true;
 };
 
 Validator.stringFormat = function( s, f ) {
@@ -13,7 +14,7 @@ Validator.stringFormat = function( s, f ) {
 
 Validator.addValidator = function ( name, error, func ) {
     Validator.prototype[ name ] = function ( ) {
-        if ( !this.error ) {
+        if ( this.continue ) {
             let args = new Array( arguments.length + 1 ),
                    i = 0;
                    
@@ -26,6 +27,7 @@ Validator.addValidator = function ( name, error, func ) {
             
             if ( !func.apply( this, args ) ) {
                 this.error = Validator.stringFormat( error, args );
+                this.continue = false;
             }
         }
         return this;
@@ -33,6 +35,14 @@ Validator.addValidator = function ( name, error, func ) {
 };
 
 var validators = {
+    optional: {
+        func: function ( x ) {
+            if ( !x ) {
+                this.continue = false;
+            }
+            return true;
+        }
+    },
     isUndefined: {
         func: function ( x ) { return x == undefined; },
         error: '{0} is not undefined'
