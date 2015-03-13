@@ -6,11 +6,17 @@ var Validator = function ( value ) {
     this.continue = true;
 };
 
+Validator.stringifyFix = function( s ) {
+    return JSON.stringify( s ).replace( /\\"|"/g, function( m ) {
+        return m === '\\"' ? m : '';
+    });
+};
+
 Validator.stringFormat = function( s, f ) {
     return s.replace( /{(\d+)}/g, function( match, number ) { 
-        return typeof f[ number ] != 'undefined' ? JSON.stringify( f[ number ] ) : '';
+        return typeof f[ number ] != 'undefined' ? Validator.stringifyFix( f[ number ] ) : '';
     });
-}
+};
 
 Validator.addValidator = function ( name, error, func ) {
     Validator.prototype[ name ] = function ( ) {
@@ -163,11 +169,19 @@ var validators = {
         },
         error: '{0} is empty'
     },
-    has: {
+    contains: {
         func: function ( x, y ) {
-            return JSON.stringify( x ).indexOf( JSON.stringify( y ) ) !== -1;
+            if ( Number( x ) === x ) {
+                x = String( x );
+            }
+            
+            if ( Array.isArray( x ) || String( x ) === x ) {
+                return x.indexOf( y ) !== -1;
+            }
+            
+            return Object( x )[ y ];
         },
-        error: '{0} has not {1}'
+        error: '{0} not contains {1}'
     },
     match: {
         func: function ( x, y ) {
