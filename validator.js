@@ -5,6 +5,12 @@ var Validator = function ( value ) {
     this.error = undefined;
 };
 
+Validator.stringFormat = function( s, f ) {
+    return s.replace( /{(\d+)}/g, function( match, number ) { 
+        return typeof f[ number ] != 'undefined' ? JSON.stringify( f[ number ] ) : '';
+    });
+}
+
 Validator.addValidator = function ( name, error, func ) {
     Validator.prototype[ name ] = function ( ) {
         if ( !this.error ) {
@@ -19,7 +25,7 @@ Validator.addValidator = function ( name, error, func ) {
             }
             
             if ( !func.apply( this, args ) ) {
-                this.error = error;
+                this.error = Validator.stringFormat( error, args );
             }
         }
         return this;
@@ -29,31 +35,31 @@ Validator.addValidator = function ( name, error, func ) {
 var validators = {
     isUndefined: {
         func: function ( x ) { return x == undefined; },
-        error: 'not undefined'
+        error: '{0} is not undefined'
     },
     isNull: {
         func: function ( x ) { return x === null; },
-        error: 'not null'
+        error: '{0} is not null'
     },
     isBoolean: {
         func: function ( x ) { return x === !!x; },
-        error: 'not boolean'
+        error: '{0} is not boolean'
     },
     isNumber: {
         func: function ( x ) { return !isNaN( x ); },
-        error: 'not number'
+        error: '{0} is not number'
     },
     isString: {
         func: function ( x ) { return String( x ) === x; },
-        error: 'not string'
+        error: '{0} is not string'
     },
     isArray: {
         func: function ( x ) { return Array.isArray( x ); },
-        error: 'not array'
+        error: '{0} is not array'
     },
     isObject: {
         func: function ( x ) { return String( x ) === String( { } ); },
-        error: 'not object'
+        error: '{0} is not object'
     },
     isJSON: {
         func: function ( x ) {
@@ -65,92 +71,134 @@ var validators = {
             }
             return true;
         },
-        error: 'not JSON'
+        error: '{0} is not JSON'
     },
     isInt: {
         func: function ( x ) { return x == ( x | 0 ); },
-        error: 'not integer'
+        error: '{0} is not integer'
     },
     isFloat: {
         func: function ( x ) { return ( +x && ( x | 0 ) ); },
-        error: 'not float'
+        error: '{0} is not float'
     },
     isNumeric: {
         func: function ( x ) { return /^\d+$/.test( x ); },
-        error: 'not numeric'
+        error: '{0} is not numeric'
     },
     isAlpha: {
         func: function ( x ) { return /^[A-z]+$/.test( x ); },
-        error: 'not alpha'
+        error: '{0} is not alpha'
     },
     isAlphanumeric: {
         func: function ( x ) { return /^\w+$/.test( x ); },
-        error: 'not alphanumeric'
+        error: '{0} is not alphanumeric'
     },
     isEmptyString: {
         func: function ( x ) { return x === ''; },
-        error: 'not empty string'
+        error: '{0} is not empty string'
     },
     isEmptyArray: {
-        func: function ( x ) { return String( x ) === String( [ ] ); },
-        error: 'not empty array'
+        func: function ( x ) { return JSON.stringify( x ) === JSON.stringify( [ ] ); },
+        error: '{0} is not empty array'
     },
     isEmptyObject: {
-        func: function ( x ) {
-            if ( x !== null ) {
-                return Object.keys( x ).length === 0;
-            }
-            return false;
-        },
-        error: 'not empty object'
+        func: function ( x ) { return JSON.stringify( x ) === JSON.stringify( { } ) },
+        error: '{0} is not empty object'
     },
     isLowerString: {
         func: function ( x ) { return x === String( x ).toLowerCase( ); },
-        error: 'not lower string'
+        error: '{0} is not lower string'
     },
     isUpperString: {
         func: function ( x ) { return x === String( x ).toUpperCase( ); },
-        error: 'not upper string'
+        error: '{0} is not upper string'
+    },
+    inString: {
+        func: function ( x, y ) {
+            if ( String( y ) === y ) {
+                return y.indexOf( x ) !== -1;
+            }
+            
+            return false;
+        },
+        error: '{0} is not in string {1}'
+    },
+    inArray: {
+        func: function ( x, y ) {
+            if ( Array.isArray( y ) ) {
+                return y.indexOf( x ) !== -1;
+            }
+            
+            return false;
+        },
+        error: '{0} is not in array {1}'
+    },
+    inObject: {
+        func: function ( x, y ) {
+            return Object( y )[ x ] !== undefined;
+        },
+        error: '{0} is not in object {1}'
+    },
+    notEmpty: {
+        func: function ( x ) {
+            if ( Number( x ) === x ) {
+                x = String( x );
+            }
+            
+            if ( Array.isArray( x ) || String( x ) === x ) {
+                return x.length > 0;
+            }
+            
+            return false;
+        },
+        error: '{0} is empty'
+    },
+    has: {
+        func: function ( x, y ) {
+            return JSON.stringify( x ).indexOf( JSON.stringify( y ) ) !== -1;
+        },
+        error: '{0} has not {1}'
+    },
+    match: {
+        func: function ( x, y ) {
+            return new RegExp( y ).exec( x ) !== null;
+        },
+        error: '{0} not match {1}'
     },
     len: {
         func: function ( x, y, z ) {
-            let not_string = String( x ) !== x;
-            let not_array = !Array.isArray( x );
+            if ( Number( x ) === x ) {
+                x = String( x );
+            }
             
-            if ( not_string && not_array )
-                return false;
+            if ( Array.isArray( x ) || String( x ) === x ) {
+                z = z || x.length;
+                return x.length >= y && x.length <= z;
+            }
             
-            z = z || x.length;
-            
-            return x.length >= y && x.length <= z;
+            return false;
         },
-        error: 'not in length'
-    },
-    in: {
-        func: function ( x, y ) {
-            return JSON.stringify( y ).indexOf( JSON.stringify( x ) ) !== -1;
-        },
-        error: 'not in'
+        error: '{0} is not in length [{1} .. {2}]'
     },
     gt: {
         func: function ( x, y ) { return x > y; },
-        error: 'not greater'
+        error: '{0} is not greater than {1}'
     },
     gte: {
         func: function ( x, y ) { return x >= y; },
-        error: 'not greater or equal'
+        error: '{0} is not greater or equal to {1}'
     },
     lt: {
         func: function ( x, y ) { return x < y; },
-        error: 'not lower'
+        error: '{0} is not lower than {1}'
     },
     lte: {
         func: function ( x, y ) { return x <= y; },
-        error: 'not lower or equal'
+        error: '{0} is not lower or equal to {1}'
     },
     eq: {
         func: function ( x, y ) { return x === y; },
-        error: 'not equal'
+        error: '{0} is not equal to {1}'
     }
 };
 
