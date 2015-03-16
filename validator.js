@@ -6,16 +6,38 @@ var Validator = function ( value ) {
     this.continue = true;
 };
 
-Validator.stringifyFix = function( s ) {
+var stringifyFix = function( s ) {
     return JSON.stringify( s ).replace( /\\"|"/g, function( m ) {
         return m === '\\"' ? m : '';
     });
 };
 
-Validator.stringFormat = function( s, f ) {
+var stringFormat = function( s, f ) {
     return s.replace( /{(\d+)}/g, function( match, number ) { 
-        return typeof f[ number ] != 'undefined' ? Validator.stringifyFix( f[ number ] ) : '';
+        return typeof f[ number ] != 'undefined' ? stringifyFix( f[ number ] ) : '';
     });
+};
+
+Validator.addValidator = function ( name, error, func ) {
+    Validator.prototype[ name ] = function ( ) {
+        if ( this.continue ) {
+            let args = new Array( arguments.length + 1 ),
+                   i = 0;
+                   
+            args[ i ] = this.value;
+            
+            while ( i < arguments.length ) {
+                args[ i + 1 ] = arguments[ i ];
+                i ++;
+            }
+            
+            if ( !func.apply( this, args ) ) {
+                this.error = stringFormat( error, args );
+                this.continue = false;
+            }
+        }
+        return this;
+    }
 };
 
 var validators = {
