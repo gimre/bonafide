@@ -157,17 +157,9 @@ var validators = {
     },
     notEmpty: {
         func: function ( x ) {
-            if ( Number( x ) === x ) {
-                x = String( x );
-            }
-            
-            if ( Array.isArray( x ) || String( x ) === x ) {
-                return x.length > 0;
-            }
-            
-            return false;
+            return x !== undefined;
         },
-        error: '{0} is empty'
+        error: 'is empty'
     },
     contains: {
         func: function ( x, y ) {
