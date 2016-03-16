@@ -5,7 +5,9 @@ Validation library for Node.js / browser
 npm install bonafide
 
 ```
-### usage exmple
+### usage example
+
+#### Custom Validator
 
 ```javascript
 'use strict';
