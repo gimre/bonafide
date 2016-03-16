@@ -12,9 +12,7 @@ npm install bonafide
 ```javascript
 'use strict';
 
-let bonafide = require( 'bonafide' ),
-    _ = require( 'lodash' ),
-    hotels = require( '' )
+let bonafide = require( 'bonafide' );
 
 bonafide.addValidator( 'isHotelArray', 'not Hotel Array', ( x ) => {
     if ( !( x instanceof Array ) ) {
