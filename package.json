@@ -1,5 +1,35 @@
 {
     "name": "bonafide",
     "version": "0.0.1",
-    "description": "All-purpose validation library"
+    "description": "All-purpose validation library",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/gimre/bonafide.git"
+    },
+    "keywords": [
+    "validation",
+    "add",
+    "validation",
+    "custom",
+    "validation"
+  ],
+    "author": "Gabriel Imre",
+    "contributors": [
+        {
+            "name": "Kovacs Alexandru Robert",
+            "email": "kovacssupki@yahoo.com",
+            "url": "https://github.com/kovacssupki",
+            "contributions": 1,
+            "hireable": false
+    }
+  ],
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/gimre/bonafide/issues"
+    },
+    "homepage": "https://github.com/gimre/bonafide#readme"
 }
