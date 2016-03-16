@@ -1,6 +1,6 @@
 {
     "name": "bonafide",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "description": "All-purpose validation library",
     "main": "index.js",
     "scripts": {
@@ -25,7 +25,14 @@
             "url": "https://github.com/kovacssupki",
             "contributions": 1,
             "hireable": false
-    }
+        },
+        {
+            "name": "Gabriel Imre",
+            "email": "imregabriel@gmail.com",
+            "url": "https://github.com/gimre",
+            "contributions": 1,
+            "hireable": false
+        }
   ],
     "license": "MIT",
     "bugs": {
