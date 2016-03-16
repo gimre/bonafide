@@ -17,7 +17,11 @@
     "custom",
     "validation"
   ],
-    "author": "Gabriel Imre",
+    "author": {
+        "name": "Gabriel Imre",
+        "email": "imregabriel@gmail.com",
+        "url": "https://github.com/gimre"
+    },
     "contributors": [
         {
             "name": "Kovacs Alexandru Robert",
